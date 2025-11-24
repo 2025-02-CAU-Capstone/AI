@@ -13,6 +13,7 @@ from sentence_transformers import SentenceTransformer, util
 import requests
 import base64
 from io import BytesIO
+from search_model import search_model
 
 DROP_THRESHOLD = 0.20
 ABS_SIM_THRESHOLD = 0.45
@@ -87,7 +88,7 @@ def find_start_timestamp(peak_idx, sims):
 def get_start_timestamp(problem):
     timestamps, sentences, embeddings, lecture_ids, chapter_ids = load_embedding_file()
 
-    model = SentenceTransformer("jhgan/ko-sroberta-multitask")
+    model = search_model
 
     peak_idx, sims = smart_search(problem, timestamps, sentences, embeddings, model)
     start_idx = find_start_timestamp(peak_idx, sims)
@@ -101,23 +102,23 @@ def get_start_timestamp(problem):
     }
 
 # MAIN
-def main():
-    while True:
-        problem = input("\n문제 입력 (q: 종료) >> ").strip()
+# def main():
+#     while True:
+#         problem = input("\n문제 입력 (q: 종료) >> ").strip()
 
-        if problem.lower() == "q":
-            print("\n종료합니다.")
-            break
+#         if problem.lower() == "q":
+#             print("\n종료합니다.")
+#             break
 
-        result = get_start_timestamp(problem)
+#         result = get_start_timestamp(problem)
 
-        print("\n=== 결과 ===")
-        print(f"Lecture: {result['lectureId']}")
-        print(f"Chapter: {result['chapterId']}")
-        print(f"Start Timestamp: {result['startTimestamp']}")
-        print(f"Peak Timestamp: {result['peakTimestamp']}")
-        print(f"Sentence: {result['sentence']}")
+#         print("\n=== 결과 ===")
+#         print(f"Lecture: {result['lectureId']}")
+#         print(f"Chapter: {result['chapterId']}")
+#         print(f"Start Timestamp: {result['startTimestamp']}")
+#         print(f"Peak Timestamp: {result['peakTimestamp']}")
+#         print(f"Sentence: {result['sentence']}")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
