@@ -6,15 +6,51 @@ import io
 reader = easyocr.Reader(['ko','en'], gpu=False)
 
 async def run_ocr(file):
+    print("[OCR] run_ocr called")
+
     contents = await file.read()
-    image = Image.open(io.BytesIO(contents))
+    print(f"[OCR] file size: {len(contents)} bytes")
+
+    try:
+        image = Image.open(io.BytesIO(contents))
+        print(f"[OCR] image loaded: mode={image.mode}, size={image.size}")
+    except Exception as e:
+        print("[OCR] failed to load image:", e)
+        return {
+            "success": False,
+            "textBoxes": None,
+            "sentences": None,
+            "raw_text": None,
+            "confidence": 0,
+            "imageWidth": 0,
+            "imageHeight": 0,
+            "message": "Image load failed"
+        }
+
     width, height = image.size
 
-    if image.mode in ('RGBA','LA','P'):
+    if image.mode in ('RGBA', 'LA', 'P'):
         image = image.convert('RGB')
+        print("[OCR] Converted to RGB")
 
     img_array = np.array(image)
-    result = reader.readtext(img_array, detail=1)
+    print(f"[OCR] numpy array shape: {img_array.shape}")
+
+    try:
+        result = reader.readtext(img_array, detail=1)
+        print(f"[OCR] result length: {len(result)}")
+    except Exception as e:
+        print("[OCR] easyocr readtext error:", e)
+        return {
+            "success": False,
+            "textBoxes": None,
+            "sentences": None,
+            "raw_text": None,
+            "confidence": 0,
+            "imageWidth": width,
+            "imageHeight": height,
+            "message": f"EasyOCR failed: {str(e)}"
+        }
 
     sentences = []
     confidences = []
