@@ -10,7 +10,7 @@ app = FastAPI()
 @app.post("/ocr")
 async def ocr_endpoint(file: UploadFile = File(...)):
     text = await run_ocr(file)
-    return {"text": text}
+    return text
 
 
 class SearchRequest(BaseModel):
