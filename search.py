@@ -20,26 +20,26 @@ ABS_SIM_THRESHOLD = 0.45
 CONCEPT_KEYWORDS = ["이론", "개념", "정의", "모형", "분류", "특징"]
 
 EMB_URL = "https://13-209-30-220.nip.io/api/embeddings/latest"
+NPY_URL = "https://13-209-30-220.nip.io/api/embeddings/latest-npy"
 
 # 1. 임베딩 로드
 def load_embedding_file():
-    # with open(path, "rb") as f:
-    #     data = pickle.load(f)
-
-    r = requests.get(EMB_URL, timeout=20)
+    # 1) metadata JSON
+    r = requests.get(EMB_URL, timeout=30)
     r.raise_for_status()
-    data = r.json()
+    meta = r.json()
 
-    emb_bytes = base64.b64decode(data["embeddingsB64"])
-    embeddings = np.load(BytesIO(emb_bytes))
+    timestamps = meta["timestamp"]
+    texts = meta["text"]
+    lecture_ids = meta["lectureId"]
+    chapter_ids = meta["chapterId"]
 
-    return (
-        data["timestamp"],
-        data["text"],
-        embeddings,
-        data["lectureId"],
-        data["chapterId"]
-    )
+    # 2) npy 벡터 파일 다운로드
+    r2 = requests.get(NPY_URL, timeout=90)
+    r2.raise_for_status()
+    embeddings = np.load(BytesIO(r2.content))
+
+    return timestamps, texts, embeddings, lecture_ids, chapter_ids
 
 
 # 2. Boost

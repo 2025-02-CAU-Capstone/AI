@@ -77,12 +77,14 @@ def upload_to_server(metadata, emb_file):
     r1 = requests.post(UPLOAD_META_API, json=metadata, timeout=60)
     r1.raise_for_status()
 
-    print("2) npy 업로드 중…")
+    print("2) npy 업로드 중 (streaming)…")
+
+    # 스트리밍 전송
     r2 = requests.post(
         UPLOAD_NPY_API,
-        data=emb_file.read(), 
+        data=emb_file,                     # ★ 변경: read() 말고 emb_file 자체를 stream으로 전송
         headers={"Content-Type": "application/octet-stream"},
-        timeout=60
+        timeout=300,                       # 큰 파일이면 timeout 여유 있게
     )
     r2.raise_for_status()
 
