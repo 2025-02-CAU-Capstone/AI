@@ -1,5 +1,8 @@
 from openai import OpenAI
 import json
+import os
+
+apiKey = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key="비밀")
 
