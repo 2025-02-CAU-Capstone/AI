@@ -4,7 +4,7 @@ import os
 
 apiKey = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(api_key="비밀")
+client = OpenAI(api_key=apiKey)
 
 
 
