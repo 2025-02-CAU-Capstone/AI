@@ -1,5 +1,5 @@
 import easyocr
-from PIL import Image
+from PIL import Image, ImageFilter, ImageEnhance
 import numpy as np
 import io
 
@@ -33,8 +33,12 @@ async def run_ocr(file):
         image = image.convert('RGB')
         print("[OCR] Converted to RGB")
     
+    #reduce noise
+    image = image.filter(ImageFilter.MedianFilter(size=3))
+
+
     #image resize
-    MAX_SIZE = 800
+    MAX_SIZE = 1200
     long_side = max(width, height)
 
     if long_side > MAX_SIZE:
@@ -43,10 +47,17 @@ async def run_ocr(file):
         new_height = int(height * scale)
 
         print(f"[OCR] Resizing image from {width}x{height} → {new_width}x{new_height}")
-        image = image.resize((new_width, new_height))
+        image = image.resize((new_width, new_height), Image.BILINEAR)
 
         #image size update
         width, height = new_width, new_height
+
+    #convert to gray-scale
+    image = image.convert("L")
+    #sharpen
+    sharpener = ImageEnhance.Sharpness(image)
+    image = sharpener.enhance(1.8)
+
 
     img_array = np.array(image)
 
