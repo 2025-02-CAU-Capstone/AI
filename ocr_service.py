@@ -34,7 +34,7 @@ async def run_ocr(file):
         print("[OCR] Converted to RGB")
     
     #image resize
-    MAX_SIZE = 1600
+    MAX_SIZE = 1000
     long_side = max(width, height)
 
     if long_side > MAX_SIZE:
