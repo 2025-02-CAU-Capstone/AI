@@ -52,12 +52,12 @@ async def run_ocr(file):
         #image size update
         width, height = new_width, new_height
 
-
     #convert to gray-scale
     image = image.convert("L")
     #sharpen
     sharpener = ImageEnhance.Sharpness(image)
     image = sharpener.enhance(1.8)
+
 
     img_array = np.array(image)
 
