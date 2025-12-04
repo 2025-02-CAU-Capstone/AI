@@ -32,6 +32,9 @@ async def run_ocr(file):
     if image.mode in ('RGBA', 'LA', 'P'):
         image = image.convert('RGB')
         print("[OCR] Converted to RGB")
+    
+    #converted to gray-scale
+    image = image.convert("L")
 
     img_array = np.array(image)
     print(f"[OCR] numpy array shape: {img_array.shape}")
