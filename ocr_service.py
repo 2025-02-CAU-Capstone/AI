@@ -48,9 +48,6 @@ async def run_ocr(file):
         #image size update
         width, height = new_width, new_height
 
-    #converted to gray-scale
-    image = image.convert("L")
-
     img_array = np.array(image)
 
     print(f"[OCR] numpy array shape: {img_array.shape}")
