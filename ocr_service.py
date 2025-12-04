@@ -33,10 +33,26 @@ async def run_ocr(file):
         image = image.convert('RGB')
         print("[OCR] Converted to RGB")
     
+    #image resize
+    MAX_SIZE = 1600
+    long_side = max(width, height)
+
+    if long_side > MAX_SIZE:
+        scale = MAX_SIZE / long_side
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+
+        print(f"[OCR] Resizing image from {width}x{height} → {new_width}x{new_height}")
+        image = image.resize((new_width, new_height))
+
+        #image size update
+        width, height = new_width, new_height
+
     #converted to gray-scale
     image = image.convert("L")
 
     img_array = np.array(image)
+
     print(f"[OCR] numpy array shape: {img_array.shape}")
 
     try:
