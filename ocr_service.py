@@ -1,5 +1,5 @@
 import easyocr
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageOps, ImageEnhance # ImageOps 필수
 import numpy as np
 import io
 
@@ -13,7 +13,11 @@ async def run_ocr(file):
 
     try:
         image = Image.open(io.BytesIO(contents))
-        print(f"[OCR] image loaded: mode={image.mode}, size={image.size}")
+        
+        # [필수 1] EXIF 회전 정보 반영 (이게 없으면 폰 사진은 90% 실패합니다)
+        image = ImageOps.exif_transpose(image)
+        
+        print(f"[OCR] image loaded & oriented: mode={image.mode}, size={image.size}")
     except Exception as e:
         print("[OCR] failed to load image:", e)
         return {
@@ -27,18 +31,16 @@ async def run_ocr(file):
             "message": "Image load failed"
         }
 
-    width, height = image.size
-
+    # 이미지 모드 통일 (RGBA 등 -> RGB)
     if image.mode in ('RGBA', 'LA', 'P'):
         image = image.convert('RGB')
-        print("[OCR] Converted to RGB")
-    
-    #reduce noise
-    image = image.filter(ImageFilter.MedianFilter(size=3))
+        
+    # [수정] MedianFilter 삭제함 (글자를 뭉개버리는 주범)
+    # image = image.filter(ImageFilter.MedianFilter(size=3))  <-- 절대 금지
 
-
-    #image resize
-    MAX_SIZE = 1200
+    # [필수 2] 리사이징
+    MAX_SIZE = 1200 
+    width, height = image.size
     long_side = max(width, height)
 
     if long_side > MAX_SIZE:
@@ -46,24 +48,24 @@ async def run_ocr(file):
         new_width = int(width * scale)
         new_height = int(height * scale)
 
-        print(f"[OCR] Resizing image from {width}x{height} → {new_width}x{new_height}")
-        image = image.resize((new_width, new_height), Image.BILINEAR)
-
-        #image size update
+        print(f"[OCR] Resizing from {width}x{height} -> {new_width}x{new_height}")
+        # [수정] BILINEAR -> LANCZOS (글자 선명도 유지에 필수)
+        image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
         width, height = new_width, new_height
 
-    #convert to gray-scale
+    # 흑백 변환
     image = image.convert("L")
-    #sharpen
+    
+    # 선명도 조절 (너무 과하면 노이즈가 생기니 1.5 정도로 낮춤)
     sharpener = ImageEnhance.Sharpness(image)
-    image = sharpener.enhance(1.8)
-
+    image = sharpener.enhance(1.5)
 
     img_array = np.array(image)
-
     print(f"[OCR] numpy array shape: {img_array.shape}")
 
     try:
+        # detail=1 로 상세 정보 획득
         result = reader.readtext(img_array, detail=1)
         print(f"[OCR] result length: {len(result)}")
     except Exception as e:
@@ -97,7 +99,6 @@ async def run_ocr(file):
                     "text": text,
                     "conf": float(conf)
                 })
-
         except:
             continue
 
