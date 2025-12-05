@@ -14,7 +14,7 @@ def post_ocr_processing(text_boxes):
 당신은 '수능 사회문화' OCR 후처리 전문가입니다.
 입력은 OCR bounding box + 텍스트 + confidence입니다.
 
-수능 사회문화 문제의 구조(지문 → <보기> → ㄱ·ㄴ·ㄷ 진술 → ①~⑤ 선택지)를 이해하고,
+수능 사회문화 문제의 구조(지문 → ①~⑤ 선택지)를 이해하고,
 OCR 오류를 교정하여 문항 단위로 정확하게 재구성하는 것이 목표입니다.
 
 당신의 임무:
@@ -78,6 +78,7 @@ OCR 오류를 교정하여 문항 단위로 정확하게 재구성하는 것이 
 - 설명문, 분석문 금지
 - JSON 외 텍스트 절대 출력 금지
 - boxes 안의 box 좌표는 원본 그대로 유지한다.
+- ㄱ, ㄴ, ㄷ, ㄹ 등을 임의로 붙이지 않는다.
 """
 
     user_prompt = {
@@ -101,7 +102,7 @@ OCR 오류를 교정하여 문항 단위로 정확하게 재구성하는 것이 
         print("Raw GPT output:", res.choices[0].message.content)
         return None
 
-
+"""
 # 테스트 데이터
 sample_text_boxes = [
     {
@@ -442,3 +443,4 @@ if __name__ == "__main__":
     result = post_ocr_processing(sample_text_boxes)
     print("\n=== FINAL RESULT ===")
     print(result)
+"""
