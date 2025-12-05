@@ -17,7 +17,8 @@ from search_model import search_model
 
 DROP_THRESHOLD = 0.20
 ABS_SIM_THRESHOLD = 0.45
-CONCEPT_KEYWORDS = ["이론", "개념", "정의", "모형", "분류", "특징"]
+CONCEPT_KEYWORDS = ["의미", "뜻한다", "설명하면", "라고 한다",
+    "현상은", "특징은", "원리는", "개념", "상징적"]
 
 EMB_URL = "https://13-209-30-220.nip.io/api/embeddings/latest"
 NPY_URL = "https://13-209-30-220.nip.io/api/embeddings/latest-npy"
